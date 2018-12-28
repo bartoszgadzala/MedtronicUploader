@@ -1,5 +1,24 @@
 package com.nightscout.android.medtronic;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
+import com.nightscout.android.dexcom.USB.HexDump;
+import com.nightscout.android.ds.DataSource;
+import com.nightscout.android.upload.GlucometerRecord;
+import com.nightscout.android.upload.MedtronicPumpRecord;
+import com.nightscout.android.upload.MedtronicSensorRecord;
+import com.nightscout.android.upload.Record;
+
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
@@ -12,33 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.LoggerFactory;
-
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.preference.PreferenceManager;
-import android.text.InputType;
-import android.util.Log;
-import android.widget.EditText;
-import android.widget.TextView.BufferType;
 
 import ch.qos.logback.classic.Logger;
-
-import com.nightscout.android.dexcom.USB.HexDump;
-import com.nightscout.android.upload.GlucometerRecord;
-import com.nightscout.android.upload.MedtronicPumpRecord;
-import com.nightscout.android.upload.MedtronicSensorRecord;
-import com.nightscout.android.upload.Record;
-import com.physicaloid.lib.Physicaloid;
 
 /**
  * Class: MedtronicReader This class manages all read operations over all the
@@ -53,7 +47,7 @@ public class MedtronicReader {
 	private Logger log = (Logger) LoggerFactory.getLogger(MedtronicReader.class
 			.getName());
 	private static final String TAG = MedtronicReader.class.getSimpleName();
-	public Physicaloid mSerialDevice;
+	public DataSource mDataSource;
 
 	protected Context context = null;
 	protected byte[] idPump = null;
@@ -138,15 +132,15 @@ public class MedtronicReader {
 	 * @param device
 	 * @param context
 	 */
-	public MedtronicReader(Physicaloid device, Context context,
-			ArrayList<Messenger> mClients, HistoricGetterThread hGetter) {
+	public MedtronicReader(DataSource device, Context context,
+						   ArrayList<Messenger> mClients, HistoricGetterThread hGetter) {
 		this.settings = context.getSharedPreferences(
 				MedtronicConstants.PREFS_NAME, 0);
 		this.context = context;
 		this.mClients = mClients;
 		this.hGetter = hGetter;
 		knownDevices = new ArrayList<String>();
-		mSerialDevice = device;
+		mDataSource = device;
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		synchronized (calibrationSelectedLock) {
 			if (prefs.contains("calibrationType")) {
@@ -511,7 +505,7 @@ public class MedtronicReader {
 		if (size >= 0) {
 			log.debug("readFromReceiver!! a leer " + size + " bytes!!");
 			try {
-				read = mSerialDevice.read(readFromDevice);
+				read = mDataSource.read(readFromDevice);
 			} catch (Exception e) {
 				Log.e(TAG, "Unable to read from serial device", e);
 				log.error("Unable to read from serial device", e);
@@ -826,7 +820,7 @@ public class MedtronicReader {
 									editor.putBoolean("isCalibrating", false);
 									editor.commit();
 								}
-								sendMessageToUI("sensor data value received",
+								sendMessageToUI("sensor data value received from " + mDataSource.getName(),
 										false);
 								break;
 							default:
@@ -1889,7 +1883,9 @@ public class MedtronicReader {
 	/**
 	 * This method process the Manual Calibration message
 	 * 
-	 * @param readData
+	 * @param value
+	 * @param instant
+	 * @param doCalibration
 	 * @return String, for debug or notification purposes
 	 */
 	public String processManualCalibrationDataMessage(float value,
@@ -2561,7 +2557,7 @@ public class MedtronicReader {
 	 *            , current sensor reading
 	 * @param initTime
 	 *            , time of the first (most actual) reading in this row
-	 * @param substract
+	 * @param subtract
 	 *            , index of this reading respectively the initTime reading.
 	 *            Each increment subtracts 5 minutes to "initTime"
 	 */
@@ -2779,7 +2775,7 @@ public class MedtronicReader {
 	 * This function calculates the SVG to upload applying a filter to the
 	 * Unfiltered glucose data
 	 * 
-	 * @param prevRecord
+	 * @param currentRecord
 	 * @param auxList
 	 * @return
 	 */
@@ -2917,7 +2913,6 @@ public class MedtronicReader {
 	/**
      * Sends an error message to be printed in the display (DEBUG) if it is repeated, It is not printed again. If UI is not visible, It will launch a pop-up message.
      * @param valuetosend
-     * @param clear, if true, the display is cleared before printing "valuetosend"
      */
 	private void sendErrorMessageToUI(String valuetosend) {
 		Log.e("medtronicCGMService", valuetosend);

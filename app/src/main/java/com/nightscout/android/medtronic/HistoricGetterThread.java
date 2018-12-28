@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Messenger;
 
 import com.nightscout.android.dexcom.USB.HexDump;
+import com.nightscout.android.ds.DataSource;
 import com.physicaloid.lib.Physicaloid;
 
 public class HistoricGetterThread extends CommandSenderThread {
@@ -24,9 +25,9 @@ public class HistoricGetterThread extends CommandSenderThread {
 	
 	public HistoricGetterThread(
 			ArrayList<Messenger> mClients, MedtronicReader reader,
-			byte[] idPump, Physicaloid mSerialDevice, Handler mHandler4) {
+			byte[] idPump, DataSource dataSource, Handler mHandler4) {
 
-		super(new byte[]{MedtronicConstants.MEDTRONIC_WAKE_UP, MedtronicConstants.MEDTRONIC_GET_LAST_PAGE, MedtronicConstants.MEDTRONIC_READ_PAGE_COMMAND}, mClients, reader, idPump, mSerialDevice, mHandler4);
+		super(new byte[]{MedtronicConstants.MEDTRONIC_WAKE_UP, MedtronicConstants.MEDTRONIC_GET_LAST_PAGE, MedtronicConstants.MEDTRONIC_READ_PAGE_COMMAND}, mClients, reader, idPump, dataSource, mHandler4);
 		// TODO Auto-generated constructor stub
 		waitTime = 500;
 		log.debug("HistoricGetterConstructor");
