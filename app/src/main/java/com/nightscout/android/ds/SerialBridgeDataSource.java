@@ -137,8 +137,13 @@ public class SerialBridgeDataSource implements DataSource {
                         }
 
                         Thread.sleep(1000);
+
+                        if (mOutput != null) {
+                            mOutput.write(new byte[0xff]);
+                        }
                     } catch (IOException ex) {
                         Log.e(TAG, "Error while checking number of available bytes");
+                        break;
                     } catch (InterruptedException ex) {
                         Log.e(TAG, "Interrupted", ex);
                         break;
@@ -146,39 +151,28 @@ public class SerialBridgeDataSource implements DataSource {
                 }
 
                 Log.d(TAG, "Closing start data check thread");
+                close();
             }
         });
         mDataCheckThread.start();
     }
 
     private synchronized void closeSocket() {
-        try {
-            if (mInput != null) {
-                mInput.close();
-            }
-        } catch (Exception ex) {
-            Log.w(TAG, "Error while closing reader");
+        if (mSocket != null && mSocket.isClosed()) {
+            Log.w(TAG, "Socket already closed");
+            mSocket = null;
+            return;
         }
-        mInput = null;
 
         try {
-            if (mOutput != null) {
-                mOutput.close();
-            }
-        } catch (Exception ex) {
-            Log.w(TAG, "Error while closing writer");
-        }
-        mOutput = null;
-
-        try {
-
-
             if (mSocket != null) {
                 mSocket.close();
             }
         } catch (Exception ex) {
-            Log.w(TAG, "Error while closing socket");
+            Log.w(TAG, "Error while closing socket", ex);
         }
         mSocket = null;
+        mInput = null;
+        mOutput = null;
     }
 }
