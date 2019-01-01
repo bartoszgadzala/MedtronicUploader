@@ -21,6 +21,7 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.nightscout.android.R;
 import com.nightscout.android.dexcom.USB.SerialInputOutputManager;
 import com.nightscout.android.dexcom.USB.USBPower;
@@ -31,7 +32,11 @@ import com.nightscout.android.upload.UploadHelper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @SuppressLint("NewApi")
 public class DexcomG4Service extends Service {
@@ -180,7 +185,7 @@ public class DexcomG4Service extends Service {
                 // is limited to 4 pages which is equivalent to 12 hours of contiguous data, so
                 // read 20 pages which is ~ 2.5 days.
                 List<EGVRecord> data = new ArrayList<EGVRecord>();
-                for(int i = 5; i >= 1; i--) {
+                for (int i = 5; i >= 1; i--) {
                     dexcomReader.readFromReceiver(getBaseContext(), i);
                     Collections.addAll(data, dexcomReader.mRD);
                 }
@@ -330,7 +335,7 @@ public class DexcomG4Service extends Service {
     // Get the devices display time and compare with its last upload time to determine
     // when to poll for next reading, since readings are on 5 minute intervals
     @SuppressLint("NewApi")
-	private long getNextUploadTimer(DexcomReader dexcomReader) {
+    private long getNextUploadTimer(DexcomReader dexcomReader) {
 
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
         Date dexcomTime = dexcomReader.getDisplayTime();
@@ -339,7 +344,7 @@ public class DexcomG4Service extends Service {
 
         if (Math.abs(dt) > FIVE_MINS_MS * 2) {
             // Use ContextText and bigText in case < 16 API
-            NM = (NotificationManager)mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            NM = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             Notification n = new Notification.Builder(mContext)
                     .setDefaults(Notification.DEFAULT_ALL)
                     .setContentTitle("Devices time mismatch!")
@@ -368,7 +373,7 @@ public class DexcomG4Service extends Service {
         if (timeSinceLastRecord < 0) {
             displayMessage("Dexcom's time is less than current record time, possible time change.");
             nextUploadTimer = THREE_MINS_MS;
-        }  else if (timeSinceLastRecord > FIVE_MINS_MS) {
+        } else if (timeSinceLastRecord > FIVE_MINS_MS) {
             nextUploadTimer = THREE_MINS_MS;
             // TODO: consider making UI display "???" for SG records since likely to be out of range
         } else {
@@ -377,6 +382,6 @@ public class DexcomG4Service extends Service {
             Log.d(TAG, "Setting next upload time to: " + nextUploadTimer / 1000 + " secs");
         }
 
-        return  nextUploadTimer;
+        return nextUploadTimer;
     }
 }

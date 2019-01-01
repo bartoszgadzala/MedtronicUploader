@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.nightscout.android.dexcom.USB.HexDump;
 import com.nightscout.android.ds.DataSource;
-import com.physicaloid.lib.Physicaloid;
 
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ public class CommandSenderThread implements Runnable {
      * Constructor
      *
      * @param commandList, array of commands to send in order.
-     * @param mClients,     communication with the UI.
+     * @param mClients,    communication with the UI.
      * @param reader,      MedtronicReader instance.
      * @param idPump
      * @param dataSource

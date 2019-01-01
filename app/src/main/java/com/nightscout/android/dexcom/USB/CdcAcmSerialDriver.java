@@ -1,6 +1,10 @@
 package com.nightscout.android.dexcom.USB;
 
-import android.hardware.usb.*;
+import android.hardware.usb.UsbConstants;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbInterface;
 import android.util.Log;
 
 import java.io.IOException;
@@ -12,8 +16,8 @@ import java.io.IOException;
  *
  * @author mike wakerly (opensource@hoho.com)
  * @see <a
- *      href="http://www.usb.org/developers/devclass_docs/usbcdc11.pdf">Universal
- *      Serial Bus Class Definitions for Communication Devices, v1.1</a>
+ * href="http://www.usb.org/developers/devclass_docs/usbcdc11.pdf">Universal
+ * Serial Bus Class Definitions for Communication Devices, v1.1</a>
  */
 public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
@@ -28,9 +32,9 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     private boolean mRts = false;
     private boolean mDtr = false;
-    
+
     private boolean isConnectionOpen = false;
-    
+
     private static final int USB_RECIP_INTERFACE = 0x01;
     private static final int USB_RT_ACM = UsbConstants.USB_TYPE_CLASS | USB_RECIP_INTERFACE;
 
@@ -38,7 +42,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     private static final int GET_LINE_CODING = 0x21;
     private static final int SET_CONTROL_LINE_STATE = 0x22;
     private static final int SEND_BREAK = 0x23;
-	private static final String SET_POWER_ON_COMMAND = "echo 'on' > \"/sys/bus/usb/devices/1-1/power/level\"";
+    private static final String SET_POWER_ON_COMMAND = "echo 'on' > \"/sys/bus/usb/devices/1-1/power/level\"";
 
     public CdcAcmSerialDriver(UsbDevice device, UsbDeviceConnection connection) {
         super(device, connection);
@@ -54,7 +58,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         // class should be USB_CLASS_COMM
 
         if (!mConnection.claimInterface(mControlInterface, true)) {
-        	isConnectionOpen = false;
+            isConnectionOpen = false;
             throw new IOException("Could not claim control interface.");
         }
         mControlEndpoint = mControlInterface.getEndpoint(0);
@@ -66,7 +70,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         // class should be USB_CLASS_CDC_DATA
 
         if (!mConnection.claimInterface(mDataInterface, true)) {
-        	isConnectionOpen = false;
+            isConnectionOpen = false;
             throw new IOException("Could not claim data interface.");
         }
         mReadEndpoint = mDataInterface.getEndpoint(1);
@@ -145,25 +149,43 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     public void setParameters(int baudRate, int dataBits, int stopBits, int parity) {
         byte stopBitsByte;
         switch (stopBits) {
-            case STOPBITS_1: stopBitsByte = 0; break;
-            case STOPBITS_1_5: stopBitsByte = 1; break;
-            case STOPBITS_2: stopBitsByte = 2; break;
-            default: throw new IllegalArgumentException("Bad value for stopBits: " + stopBits);
+            case STOPBITS_1:
+                stopBitsByte = 0;
+                break;
+            case STOPBITS_1_5:
+                stopBitsByte = 1;
+                break;
+            case STOPBITS_2:
+                stopBitsByte = 2;
+                break;
+            default:
+                throw new IllegalArgumentException("Bad value for stopBits: " + stopBits);
         }
 
         byte parityBitesByte;
         switch (parity) {
-            case PARITY_NONE: parityBitesByte = 0; break;
-            case PARITY_ODD: parityBitesByte = 1; break;
-            case PARITY_EVEN: parityBitesByte = 2; break;
-            case PARITY_MARK: parityBitesByte = 3; break;
-            case PARITY_SPACE: parityBitesByte = 4; break;
-            default: throw new IllegalArgumentException("Bad value for parity: " + parity);
+            case PARITY_NONE:
+                parityBitesByte = 0;
+                break;
+            case PARITY_ODD:
+                parityBitesByte = 1;
+                break;
+            case PARITY_EVEN:
+                parityBitesByte = 2;
+                break;
+            case PARITY_MARK:
+                parityBitesByte = 3;
+                break;
+            case PARITY_SPACE:
+                parityBitesByte = 4;
+                break;
+            default:
+                throw new IllegalArgumentException("Bad value for parity: " + parity);
         }
 
         byte[] msg = {
-                (byte) ( baudRate & 0xff),
-                (byte) ((baudRate >> 8 ) & 0xff),
+                (byte) (baudRate & 0xff),
+                (byte) ((baudRate >> 8) & 0xff),
                 (byte) ((baudRate >> 16) & 0xff),
                 (byte) ((baudRate >> 24) & 0xff),
                 stopBitsByte,
@@ -218,10 +240,10 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         int value = (mRts ? 0x2 : 0) | (mDtr ? 0x1 : 0);
         sendAcmControlMessage(SET_CONTROL_LINE_STATE, value, null);
     }
-    
-    @Override 
-    public boolean isConnectionOpen(){
-    	return isConnectionOpen;
+
+    @Override
+    public boolean isConnectionOpen() {
+        return isConnectionOpen;
     }
 
 

@@ -21,12 +21,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Closeable;
-
 import com.nightscout.android.R;
+
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Displays an EULA ("End User License Agreement") that the user has to accept before
@@ -49,6 +49,7 @@ public class Eula {
          * Called when the user has accepted the eula and the dialog closes.
          */
         void onEulaAgreedTo();
+
         /**
          * Called when the user has refused the eula and the dialog closes.
          */
@@ -79,7 +80,7 @@ public class Eula {
             });
             builder.setNegativeButton(R.string.eula_refuse, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                	if (activity instanceof OnEulaAgreedTo) {
+                    if (activity instanceof OnEulaAgreedTo) {
                         ((OnEulaAgreedTo) activity).onEulaRefusedTo();
                     }
                     refuse(activity);
@@ -87,7 +88,7 @@ public class Eula {
             });
             builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 public void onCancel(DialogInterface dialog) {
-                	if (activity instanceof OnEulaAgreedTo) {
+                    if (activity instanceof OnEulaAgreedTo) {
                         ((OnEulaAgreedTo) activity).onEulaRefusedTo();
                     }
                     refuse(activity);

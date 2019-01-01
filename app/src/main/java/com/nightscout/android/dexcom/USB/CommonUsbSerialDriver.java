@@ -42,10 +42,14 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     protected final Object mReadBufferLock = new Object();
     protected final Object mWriteBufferLock = new Object();
 
-    /** Internal read buffer.  Guarded by {@link #mReadBufferLock}. */
+    /**
+     * Internal read buffer.  Guarded by {@link #mReadBufferLock}.
+     */
     protected byte[] mReadBuffer;
 
-    /** Internal write buffer.  Guarded by {@link #mWriteBufferLock}. */
+    /**
+     * Internal write buffer.  Guarded by {@link #mWriteBufferLock}.
+     */
     protected byte[] mWriteBuffer;
 
     public CommonUsbSerialDriver(UsbDevice device, UsbDeviceConnection connection) {
