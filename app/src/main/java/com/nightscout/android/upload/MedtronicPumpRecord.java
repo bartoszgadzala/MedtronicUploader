@@ -1,6 +1,5 @@
 package com.nightscout.android.upload;
 
-import org.bson.Document;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -90,52 +89,6 @@ public class MedtronicPumpRecord extends DeviceRecord implements Serializable {
 
     public void setsSensorID(String sSensorID) {
         this.sSensorID = sSensorID;
-    }
-
-    public void mergeCurrentWithDBObject(Document previousRecord) {
-        if (!previousRecord.containsKey("insulinLeft") || insulinLeft > 0) {
-            previousRecord.put("insulinLeft", insulinLeft);
-        }
-        if (!previousRecord.containsKey("status") || !("---".equals(status))) {
-            previousRecord.put("status", status);
-        }
-        if (!previousRecord.containsKey("alarm") || !("---".equals(alarm))) {
-            previousRecord.put("alarm", alarm);
-        }
-        if (!previousRecord.containsKey("temporaryBasal") || !("---".equals(temporaryBasal))) {
-            previousRecord.put("temporaryBasal", temporaryBasal);
-        }
-        if (!previousRecord.containsKey("batteryStatus") || !("---".equals(batteryStatus))) {
-            previousRecord.put("batteryStatus", batteryStatus);
-        }
-        if (!previousRecord.containsKey("batteryVoltage") || !("---".equals(batteryVoltage))) {
-            previousRecord.put("batteryVoltage", batteryVoltage);
-        }
-        if (!previousRecord.containsKey("model") || !("---".equals(model))) {
-            previousRecord.put("model", model);
-        }
-        if (!previousRecord.containsKey("sRemoteControlID1") || !("---".equals(sRemoteControlID1))) {
-            previousRecord.put("sRemoteControlID1", sRemoteControlID1);
-        }
-        if (!previousRecord.containsKey("sRemoteControlID2") || !("---".equals(sRemoteControlID2))) {
-            previousRecord.put("sRemoteControlID2", sRemoteControlID2);
-        }
-        if (!previousRecord.containsKey("sRemoteControlID3") || !("---".equals(sRemoteControlID3))) {
-            previousRecord.put("sRemoteControlID3", sRemoteControlID3);
-        }
-        if (!previousRecord.containsKey("sParadigmLink1") || !("---".equals(sParadigmLink1))) {
-            previousRecord.put("sParadigmLink1", sParadigmLink1);
-        }
-        if (!previousRecord.containsKey("sParadigmLink2") || !("---".equals(sParadigmLink2))) {
-            previousRecord.put("sParadigmLink2", sParadigmLink2);
-        }
-        if (!previousRecord.containsKey("sParadigmLink3") || !("---".equals(sParadigmLink3))) {
-            previousRecord.put("sParadigmLink3", sParadigmLink3);
-        }
-        if (!("---".equals(sSensorID)) || (!previousRecord.containsKey("sSensorID"))) {
-            previousRecord.put("sSensorID", sSensorID);
-        }
-        previousRecord.put("isWarmingUp", isWarmingUp);
     }
 
     public void mergeCurrentWithDBObject(JSONObject previousRecord) {

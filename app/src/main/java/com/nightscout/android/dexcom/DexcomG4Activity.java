@@ -62,11 +62,10 @@ import ch.qos.logback.classic.Logger;
 public class DexcomG4Activity extends Activity implements OnSharedPreferenceChangeListener, OnEulaAgreedTo {
     private Logger log = (Logger) LoggerFactory.getLogger(DexcomG4Activity.class.getName());
     //CGMs supported
-    public static final int DEXCOMG4 = 0;
     public static final int MEDTRONIC_CGM = 1;
 
     private static final String TAG = DexcomG4Activity.class.getSimpleName();
-    private int cgmSelected = DEXCOMG4;
+    private int cgmSelected = MEDTRONIC_CGM;
     private int calibrationSelected = MedtronicConstants.CALIBRATION_GLUCOMETER;
 
     private Handler mHandler = new Handler();
@@ -156,25 +155,6 @@ public class DexcomG4Activity extends Activity implements OnSharedPreferenceChan
                     Log.e("MedtronicCGMMessage", MedtronicConstants.MSG_MEDTRONIC_CALIBRATION_DONE + "\n");
                     mHandler.removeCallbacks(updateDataView);
                     mHandler.post(updateDataView);
-                    break;
-                case MedtronicConstants.MSG_REFRESH_DB_CONNECTION:
-                    if (mService != null) {
-                        try {
-                            Message message = Message.obtain(null, MedtronicConstants.MSG_REFRESH_DB_CONNECTION);
-                            msg.replyTo = mMessenger;
-                            mService.send(message);
-                        } catch (RemoteException e) {
-                            StringBuffer sb1 = new StringBuffer("");
-                            sb1.append("EXCEPTION!!!!!! " + e.getMessage() + " " + e.getCause());
-                            for (StackTraceElement st : e.getStackTrace()) {
-                                sb1.append(st.toString()).append("\n");
-                            }
-                            Log.e("ApprovingGlucVal", "Error approving gluc. value \n " + sb1.toString());
-                            if (ISDEBUG) {
-                                display.setText(display.getText() + "Error approving gluc. value\n", BufferType.EDITABLE);
-                            }
-                        }
-                    }
                     break;
                 default:
                     super.handleMessage(msg);
@@ -448,8 +428,6 @@ public class DexcomG4Activity extends Activity implements OnSharedPreferenceChan
                     } else
                         calibrationSelected = MedtronicConstants.CALIBRATION_GLUCOMETER;
                 }
-            } else {
-                cgmSelected = DEXCOMG4;
             }
         }
         mArrow = new BatteryReceiver();
@@ -1042,8 +1020,6 @@ public class DexcomG4Activity extends Activity implements OnSharedPreferenceChan
                         } else
                             calibrationSelected = MedtronicConstants.CALIBRATION_GLUCOMETER;
                     }
-                } else {
-                    cgmSelected = DEXCOMG4;
                 }
 	         	/*if (calibrationSelected == MedtronicConstants.CALIBRATION_MANUAL)
 	         		b4.setVisibility(View.VISIBLE);

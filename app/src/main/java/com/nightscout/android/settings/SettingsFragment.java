@@ -86,20 +86,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         final ListPreference historicPeriod = (ListPreference) findPreference("historicPeriod");
         final ListPreference historicMixPeriod = (ListPreference) findPreference("historicMixPeriod");
         final SwitchPreference enableRest = (SwitchPreference) findPreference("EnableRESTUpload");
-        final SwitchPreference enableMongo = (SwitchPreference) findPreference("EnableMongoUpload");
         enableRest.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 final Boolean val = (Boolean) newValue;
-                if (enableMongo.isChecked() == val && val)
-                    enableMongo.setChecked(!val);
-                return true;
-            }
-        });
-        enableMongo.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                final Boolean val = (Boolean) newValue;
-                if (enableRest.isChecked() == val && val)
-                    enableRest.setChecked(!val);
                 return true;
             }
         });
